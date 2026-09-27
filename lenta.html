@@ -924,7 +924,7 @@ const DatumCard = (() => {
         }
         function observationLabel(key, p, t = p.t) {
           const source = p.refusalBoundary ? p.observation : p;
-          if (!source) return 'граница отказа ' + p.day;
+          if (!source) return 'нет оценки с ' + p.day;
           const originalEnd = observationEnds[key];
           const held = source !== p || (originalEnd !== undefined && (source.t > originalEnd || t > originalEnd));
           const day = originalEnd !== undefined && source.t > originalEnd ? iso(originalEnd) : source.day;
@@ -934,7 +934,7 @@ const DatumCard = (() => {
           return selected().map(key => {
             const last = series[key].filter(p => p.valid && p.t >= start && p.t <= end).at(-1);
             if (last) {
-              if (last.refusalBoundary && !last.observation) return titles[key] + ': граница отказа ' + last.day;
+              if (last.refusalBoundary && !last.observation) return titles[key] + ': нет оценки с ' + last.day;
               const throughEnd = key !== 'price' && seriesRuns[key].some(run => valueAt(run, end, false));
               return titles[key] + ': ' + money(last.values[0]) + ' · последнее ' + observationLabel(key, last, throughEnd ? end : last.t);
             }
@@ -1110,7 +1110,7 @@ const DatumCard = (() => {
     const sw = document.createElement('i');
     sw.className = 'fx-sw ' + (fit >= 0 ? SWATCH[fit] : 'none');
     sw.setAttribute('aria-hidden', 'true');
-    span.append(sw, model + ': ' + (fit >= 0 ? FITS[fit] : 'нет класса'));
+    span.append(sw, model + ': ' + (fit >= 0 ? FITS[fit] : 'нет оценки'));
     return span;
   }
 
@@ -1140,7 +1140,7 @@ const DatumCard = (() => {
     if (c.ud) {
       const flag = document.createElement('span');
       flag.className = 'fx-flag';
-      flag.textContent = '† найден непрочитанный долговой тег: справедливая стоимость может быть завышена';
+      flag.textContent = '† часть долга не учтена: справедливая стоимость может быть завышена';
       meta.append(flag);
     }
     const card = document.createElement('div');
