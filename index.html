@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
 <style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<script>window.FX_NEW_TAB=true</script>
 <title>Обзор — 206 компаний</title>
 <meta name="description" content="Обзор: компании, у которых история оценки DCF совпадает с историей цены, и ещё 2 компании без класса; цены на 30.09.2026.">
 <style>
@@ -1806,6 +1807,7 @@ syncModel();render();
   const title = document.getElementById('fx-ov-tk');
   const closer = document.getElementById('fx-ov-close');
   const cache = Object.create(null);
+  const LIST_TITLE = document.title;
   let opener = null;
 
   function load(t) {
@@ -1879,6 +1881,7 @@ syncModel();render();
     body.replaceChildren(item);
     body.scrollTop = 0;
     title.textContent = c.t + ' · ' + c.n;
+    document.title = c.t + ' — ' + c.n;     // tabs of several companies tell themselves apart
     overlay.hidden = false;
     host.inert = true;
     document.documentElement.style.overflow = 'hidden';
@@ -1888,6 +1891,7 @@ syncModel();render();
   function closeCard() {
     if (overlay.hidden) return;
     overlay.hidden = true;
+    document.title = LIST_TITLE;
     body.replaceChildren();
     host.inert = false;
     document.documentElement.style.overflow = '';
@@ -1896,7 +1900,16 @@ syncModel();render();
     if (link) link.focus({ preventScroll: true });
     opener = null;
   }
-  window.fxOpenCard = (ticker, row) => openCard(ticker, row);
+  // On the static site a row opens the company in a new tab (this page with #TICKER,
+  // which opens that card at once); where a new tab cannot be opened - a sandboxed
+  // viewer, a blocked pop-up - the card opens over the list as before.
+  window.fxOpenCard = (ticker, row) => {
+    if (window.FX_NEW_TAB) {
+      const tab = window.open(location.pathname + location.search + '#' + encodeURIComponent(ticker), '_blank');
+      if (tab) { try { tab.opener = null; } catch (error) {} return; }
+    }
+    openCard(ticker, row);
+  };
 
   closer.addEventListener('click', closeCard);
   overlay.addEventListener('mousedown', event => { if (event.target === overlay) closeCard(); });
